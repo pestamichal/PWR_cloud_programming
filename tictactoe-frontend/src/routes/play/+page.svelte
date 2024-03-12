@@ -1,5 +1,6 @@
 <script lang="ts">
     import { slide } from 'svelte/transition';
+    import { onMount } from 'svelte';
 
     let username = '';
     let game = false;
@@ -7,10 +8,40 @@
     let noConnectionErr = false;
     let invalidUsernameErr = false;
     let sessionId = '';
+    let playerType = ' ';
 
     const url = 'http://127.0.0.1:8000/api/register_for_game/';
+    let sessionSocket: WebSocket;
+  
 
-    
+    onMount(async () => {
+        const savedSessionId = sessionStorage.getItem('session_id');
+        const savedUsername = sessionStorage.getItem('tictactoe_username');
+        const savedPlayerType = sessionStorage.getItem('player_type');
+        if(savedSessionId != null && savedUsername != null && savedPlayerType != null) {
+            sessionId = savedSessionId;
+            username = savedUsername;
+            playerType = savedPlayerType;
+        }else {
+            sessionId = ''
+        }
+
+        sessionSocket = new WebSocket('ws://localhost:8000/ws/gamesession/');
+        sessionSocket.onmessage = function(e){
+            const data = JSON.parse(e.data);
+            console.log(data);
+            const message_type = data['type'];
+            switch(message_type){
+                case 'begin_game': return;
+                case 'move': return;
+                case 'cancel': return;
+            }     
+        }
+        sessionSocket.onclose = function(e){
+            console.error('Socket closed unexpectedly');
+        }
+
+    })
 
     async function handlePlay(){
         try{
@@ -24,7 +55,15 @@
             if(response.ok){    
                 noConnectionErr = false;
                 sessionId = data['session_id'];
-                localStorage.setItem('session_id', sessionId);
+                playerType = data['player_type'];
+                sessionStorage.setItem('tictactoe_username', username);
+                sessionStorage.setItem('session_id', sessionId);
+                sessionStorage.setItem('player_type', playerType);
+                console.log(playerType);
+                sessionSocket.send(JSON.stringify({
+                    'type': 'joined',
+                    'session_id': sessionId
+                }))
             }else{
                 noConnectionErr = true;
             }
@@ -35,18 +74,26 @@
     }
 
     function makeMove(x: Number, y: Number) {
-        console.log(x + " " + y);
+        sessionSocket.send(JSON.stringify({
+            'type': 'move',
+            'session_id': sessionId,
+            'row': x,
+            'col': y,
+            'player_type': playerType
+        }))
     }
 
     function cancelGame(){
+        sessionSocket.send(JSON.stringify({
+            'type': 'cancel',
+            'session_id': sessionId,
+        }))
         sessionId = '';
-        localStorage.setItem('session_id', '');
+        playerType = ' ';
+        sessionStorage.setItem('session_id', '');
+        sessionStorage.setItem('playerType', playerType);
     }
 
-    function endGame(){
-        username = '';
-        game = false;
-    }
 </script>
 
 
@@ -74,7 +121,7 @@
         </table>
         <button 
             class=" text-white bg-blue-500 px-3 py-2 rounded-md font-bold"
-            on:click={endGame}
+            on:click={cancelGame}
         >
             End game
         </button>

@@ -5,12 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0862b1dc-69a6-485c-bf4e-ea972e111c43" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/gamemanager/consumers.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gamemanager/routing.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Pipfile" beforeDir="false" afterPath="$PROJECT_DIR$/Pipfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Pipfile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Pipfile.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gamemanager/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/gamemanager/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gamemanager/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/gamemanager/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tictactoe/asgi.py" beforeDir="false" afterPath="$PROJECT_DIR$/tictactoe/asgi.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tictactoe/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/tictactoe/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tictactoe-frontend/src/routes/play/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/../tictactoe-frontend/src/routes/play/+page.svelte" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,6 +29,9 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2dYdOh8gviV6NdwC5piAONtXJIq" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -52,7 +60,7 @@
       <updated>1710188914580</updated>
       <workItem from="1710188915715" duration="5004000" />
       <workItem from="1710194064161" duration="1001000" />
-      <workItem from="1710238550213" duration="5041000" />
+      <workItem from="1710238550213" duration="17274000" />
     </task>
     <servers />
   </component>

@@ -10,15 +10,15 @@ def generate_session_id():
 
 class RegisterForGame(APIView):
     def post(self, request, username):
-        available_board = GameSession.objects.filter(player2='')
+        available_board = GameSession.objects.filter(player2='', active=True)
         if available_board.exists():
             game_session = available_board.first()
             game_session.player2 = username
             game_session.save()
             session_id = game_session.session_id
-            return JsonResponse({"session_id": session_id}, status=200)
+            return JsonResponse({"session_id": session_id, 'player_type': 'O'}, status=200)
         else:
             session_id = generate_session_id()
             GameSession.objects.create(session_id = session_id, player1 = username)
-            return  JsonResponse({'session_id': session_id}, status=200)
+            return  JsonResponse({'session_id': session_id, 'player_type': 'X'}, status=200)
 
