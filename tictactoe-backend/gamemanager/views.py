@@ -1,13 +1,12 @@
 
-import random
-import string
+import uuid
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from .models import GameSession
 
 
 def generate_session_id():
-    return ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+    return uuid.uuid4()
 
 class RegisterForGame(APIView):
     def post(self, request, username):
@@ -17,9 +16,9 @@ class RegisterForGame(APIView):
             game_session.player2 = username
             game_session.save()
             session_id = game_session.session_id
-            return JsonResponse({"message": "Wolny stół istnieje"}, status=200)
+            return JsonResponse({"session_id": session_id}, status=200)
         else:
             session_id = generate_session_id()
             GameSession.objects.create(session_id = session_id, player1 = username)
-            return  JsonResponse({'message': 'Zaczęto nową grę'}, status=200)
+            return  JsonResponse({'session_id': session_id}, status=200)
 
