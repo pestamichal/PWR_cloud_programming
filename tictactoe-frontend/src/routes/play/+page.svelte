@@ -9,6 +9,7 @@
     let invalidUsernameErr = false;
     let sessionId = '';
     let playerType = ' ';
+    let resultMessage = '';
 
     const url = 'http://127.0.0.1:8000/api/register_for_game/';
     let sessionSocket: WebSocket;
@@ -27,14 +28,55 @@
         }
 
         sessionSocket = new WebSocket('ws://localhost:8000/ws/gamesession/');
+        sessionSocket.onopen = function(e){
+            if(sessionId !== '')
+            sessionSocket.send(JSON.stringify({
+                'type': 'init',
+                'session_id': sessionId
+            }))
+        }
         sessionSocket.onmessage = function(e){
             const data = JSON.parse(e.data);
-            console.log(data);
             const message_type = data['type'];
+            const message_session_id = data['session_id'];
+            if(message_session_id !== sessionId) return;
             switch(message_type){
-                case 'begin_game': return;
-                case 'move': return;
-                case 'cancel': return;
+                case 'init':
+                    const gameActive = data['is_active'];
+                    const playersReady = data['players_ready'];
+                    gameBoard = data['board_state'];
+                    if(gameActive && playersReady){
+                        game = true;
+                    }else if(gameActive){
+                        game = false;
+                    }else{
+                        reset();
+                    }
+                    break;
+                case 'begin_game': 
+                    game = true;
+                    break;
+                case 'move': 
+                    gameBoard = data['board_state'];
+                    break;
+                case 'result':
+                    const winner = data['winner'];
+                    const draw = data['draw'];
+                    const victor_symbol = data['player_type'];
+                    if(winner && victor_symbol === playerType){
+                        resultMessage = 'You Won! :)'
+                    }else if(winner && victor_symbol !== playerType){
+                        resultMessage = 'You Lost... :('
+                    }else if(draw){
+                        resultMessage = 'Draw :|'
+                    }
+                    break;    
+                case 'cancel': 
+                    reset();
+                    break;
+                case 'gamenotfound':
+                    reset();
+                    break;
             }     
         }
         sessionSocket.onclose = function(e){
@@ -59,7 +101,6 @@
                 sessionStorage.setItem('tictactoe_username', username);
                 sessionStorage.setItem('session_id', sessionId);
                 sessionStorage.setItem('player_type', playerType);
-                console.log(playerType);
                 sessionSocket.send(JSON.stringify({
                     'type': 'joined',
                     'session_id': sessionId
@@ -68,7 +109,7 @@
                 noConnectionErr = true;
             }
         }catch(e){
-            console.log(e);
+            console.error(e);
             noConnectionErr = true;
         }
     }
@@ -83,21 +124,45 @@
         }))
     }
 
-    function cancelGame(){
+    function playAgain(){
+        gameBoard = [[' ', ' ', ' '], [' ', ' ', ' '], [' ', ' ', ' ']];
+        game = false;
+        resultMessage = '';
+        if(playerType === 'X') playerType = 'O'
+        else playerType = 'X';
         sessionSocket.send(JSON.stringify({
-            'type': 'cancel',
-            'session_id': sessionId,
-        }))
+            'type': 'playagain',
+            'session_id': sessionId
+        }));
+    }
+
+    function cancelGame(){
+        try{
+            sessionSocket.send(JSON.stringify({
+                'type': 'cancel',
+                'session_id': sessionId,
+            }))
+
+        }catch(e){
+            console.error(e);
+        }
+        reset();
+    }
+
+    function reset(){
         sessionId = '';
-        playerType = ' ';
-        sessionStorage.setItem('session_id', '');
-        sessionStorage.setItem('playerType', playerType);
+        playerType = '';
+        game = false;
+        resultMessage = '';
+        gameBoard = [[' ', ' ', ' '], [' ', ' ', ' '], [' ', ' ', ' ']];
+        sessionStorage.setItem('session_id', sessionId);
+        sessionStorage.setItem('player_type', playerType);
     }
 
 </script>
 
 
-<div class=" flex flex-col justify-center items-center h-screen">
+<div class=" flex flex-col justify-center items-center h-screen gap-3">
     <div class=" flex flex-col justify-center items-center bg-gray-200 px-10 py-16 gap-5 text-xl rounded-lg">
         {#if username && sessionId !== '' && game}
         <h1 class=" text-3xl font-bold">Tic Tac Toe</h1>
@@ -106,7 +171,7 @@
             <tr>
                 {#each row as column, j}
                     <td class=" w-[100px] h-[100px] border-black border-2">
-                        <button class=" h-full w-full text-6xl"
+                        <button class=" h-full w-full text-6xl {playerType == column ? 'text-green-500' : 'text-red-500'}"
                                 on:click={() => {
                                    makeMove(i, j);
                                 }}
@@ -119,12 +184,22 @@
             </tr>
             {/each}
         </table>
+        {#if resultMessage === ''}
         <button 
             class=" text-white bg-blue-500 px-3 py-2 rounded-md font-bold"
             on:click={cancelGame}
         >
             End game
         </button>
+        {:else}
+        <button 
+            class=" text-white bg-blue-500 px-3 py-2 rounded-md font-bold"
+            on:click={playAgain}
+        >
+            Play Again!
+        </button>  
+        {/if}
+        
         {:else if username && sessionId !== ''}
             <h1 class=" font-bold">Waiting for the other player...</h1>
             <i class="fa-solid fa-spinner fa-spin font-bold text-3xl"></i>
@@ -145,6 +220,8 @@
             {/if}
         {/if}
     </div>
+
+    <h1 class=" font-bold text-3xl">{resultMessage}</h1>
     
 </div>
 
