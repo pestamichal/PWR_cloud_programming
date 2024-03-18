@@ -23,57 +23,45 @@
             sessionId = savedSessionId;
             username = savedUsername;
             playerType = savedPlayerType;
+            connect();
         }else {
             sessionId = ''
         }
+        console.log("sessionid: " + sessionId);
 
-        sessionSocket = new WebSocket('ws://localhost:8000/ws/gamesession/');
+    })
+
+    function connect(){
+        console.log('connecting to websocket!');
+        sessionSocket = new WebSocket(`ws://localhost:8000/ws/gamesession/?sessionid=${sessionId}`);
         sessionSocket.onopen = function(e){
             if(sessionId !== '')
             sessionSocket.send(JSON.stringify({
                 'type': 'init',
                 'session_id': sessionId
-            }))
+            }))      
         }
         sessionSocket.onmessage = function(e){
+
             const data = JSON.parse(e.data);
             const message_type = data['type'];
-            const message_session_id = data['session_id'];
-            if(message_session_id !== sessionId) return;
+
             switch(message_type){
-                case 'init':
+                case 'state':
                     const gameActive = data['is_active'];
                     const playersReady = data['players_ready'];
+                    const result = data['result'];
                     gameBoard = data['board_state'];
-                    if(gameActive && playersReady){
-                        game = true;
-                    }else if(gameActive){
-                        game = false;
-                    }else{
-                        reset();
-                    }
+
+                    game = gameActive && playersReady;
+                    if(!gameActive) reset();
+
+                    if(result === playerType) resultMessage = 'You Won! :)'
+                    else if(result === 'D') resultMessage = 'Draw :|';
+                    else if(result === ' ') resultMessage = '';
+                    else resultMessage = 'You Lost... :(';
                     break;
-                case 'begin_game': 
-                    game = true;
-                    break;
-                case 'move': 
-                    gameBoard = data['board_state'];
-                    break;
-                case 'result':
-                    const winner = data['winner'];
-                    const draw = data['draw'];
-                    const victor_symbol = data['player_type'];
-                    if(winner && victor_symbol === playerType){
-                        resultMessage = 'You Won! :)'
-                    }else if(winner && victor_symbol !== playerType){
-                        resultMessage = 'You Lost... :('
-                    }else if(draw){
-                        resultMessage = 'Draw :|'
-                    }
-                    break;    
-                case 'cancel': 
-                    reset();
-                    break;
+   
                 case 'gamenotfound':
                     reset();
                     break;
@@ -82,8 +70,7 @@
         sessionSocket.onclose = function(e){
             console.error('Socket closed unexpectedly');
         }
-
-    })
+    }
 
     async function handlePlay(){
         try{
@@ -101,10 +88,7 @@
                 sessionStorage.setItem('tictactoe_username', username);
                 sessionStorage.setItem('session_id', sessionId);
                 sessionStorage.setItem('player_type', playerType);
-                sessionSocket.send(JSON.stringify({
-                    'type': 'joined',
-                    'session_id': sessionId
-                }))
+                connect();
             }else{
                 noConnectionErr = true;
             }
@@ -130,6 +114,7 @@
         resultMessage = '';
         if(playerType === 'X') playerType = 'O'
         else playerType = 'X';
+        sessionStorage.setItem('player_type', playerType);
         sessionSocket.send(JSON.stringify({
             'type': 'playagain',
             'session_id': sessionId
@@ -155,8 +140,8 @@
         game = false;
         resultMessage = '';
         gameBoard = [[' ', ' ', ' '], [' ', ' ', ' '], [' ', ' ', ' ']];
-        sessionStorage.setItem('session_id', sessionId);
-        sessionStorage.setItem('player_type', playerType);
+        sessionStorage.removeItem('session_id');
+        sessionStorage.removeItem('player_type');
     }
 
 </script>
@@ -189,7 +174,7 @@
             class=" text-white bg-blue-500 px-3 py-2 rounded-md font-bold"
             on:click={cancelGame}
         >
-            End game
+            Exit game
         </button>
         {:else}
         <button 

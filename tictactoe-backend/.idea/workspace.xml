@@ -8,7 +8,10 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gamemanager/consumers.py" beforeDir="false" afterPath="$PROJECT_DIR$/gamemanager/consumers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tictactoe/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/tictactoe/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gamemanager/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/gamemanager/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tictactoe-frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../tictactoe-frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tictactoe-frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../tictactoe-frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tictactoe-frontend/svelte.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/../tictactoe-frontend/svelte.config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,7 +58,8 @@
       <workItem from="1710194064161" duration="1001000" />
       <workItem from="1710238550213" duration="17696000" />
       <workItem from="1710324565299" duration="47000" />
-      <workItem from="1710332285690" duration="8473000" />
+      <workItem from="1710332285690" duration="8543000" />
+      <workItem from="1710779037583" duration="9304000" />
     </task>
     <servers />
   </component>

@@ -10,6 +10,7 @@ class GameSession(models.Model):
     board_state = models.JSONField(default=default_board_state)
     active = models.BooleanField(default=True)
     last_move = models.CharField(max_length=1, default=' ')
+    result = models.CharField(max_length=1, default=' ')
 
     def __str__(self):
         return self.session_id
