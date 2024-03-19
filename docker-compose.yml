@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./tictactoe-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5050:5050"
+
+  backend:
+    build:
+      context: ./tictactoe-backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
